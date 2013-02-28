@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Street Sphere: Photo Sphere to Street View</title>
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:regular,medium,thin,italic,mediumitalic,bold" title="roboto">
+    <style>
+      html, input, h1 {
+        font-family: Roboto, "Open Sans", sans-serif;
+        font-weight: normal;
+      }
+      #file {
+        width: 100%;
+      }
+      #submit {
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Street Sphere: Photo Sphere to Street View generator</h1>
+    <p>
+      Upload your Android photo sphere image, and you’ll get back a ready-to-use
+      Google Maps API Custom Street View web page.
+    </p>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+      <input type="file" name="img" id="file">
+      <input type="submit" value="Upload!" id="submit">
+    </form>
+    <p>
+      The source code for this app is available on GitHub and Google Code, under
+      an Apache 2.0 licence.
+    </p>
+  </body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {{.Header}}
+    <title>Photo Sphere Custom StreetView</title>
+    <meta charset="utf-8">
+    <script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <script>
+      function initialize() {
+        var panoOptions = {
+          pano: 'custom',
+          visible: true,
+          panoProvider: getCustomPanorama
+        };
+
+        var panorama = new google.maps.StreetViewPanorama(
+          document.getElementById('pano-canvas'), panoOptions);
+      }
+
+      function getCustomPanoramaTileUrl(pano, zoom, tileX, tileY) {
+        return '{{.ImageFilename}}';
+      }
+
+      function getCustomPanorama(pano, zoom, tileX, tileY) {
+        if (pano == 'custom') {
+          return {
+            location: {
+              pano: 'custom',
+              description: 'Custom Street View'
+            },
+            tiles: {
+              tileSize: new google.maps.Size({{.Pano.TotalWidth}}, {{.Pano.TotalHeight}}),
+              worldSize: new google.maps.Size({{.Pano.TotalWidth}}, {{.Pano.TotalHeight}}),
+              getTileUrl: getCustomPanoramaTileUrl
+            }
+          };
+        }
+      }
+
+      google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+  </head>
+  <body>
+    <div id="pano-canvas" style="height: 500px"></div>
+  </body>
+</html>
