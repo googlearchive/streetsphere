@@ -1,6 +1,7 @@
 package streetsphere
 
 import (
+	"bufio"
 	"encoding/binary"
 	"io"
 )
@@ -16,56 +17,49 @@ type Section struct {
 	Offset int
 }
 
-// readByte reads the next byte from r.
-func readByte(r io.Reader) (byte, error) {
-	b := make([]byte, 1)
-	_, err := r.Read(b)
-	return b[0], err
-}
-
 // NextSection finds the next section denoted by marker m.
-func NextSection(r io.Reader, m Marker) (s *Section, err error) {
+func NextSection(r *bufio.Reader, m Marker) (*Section, error) {
 	var prev byte
-	var b byte
 
 	offset := 0
 
 	for {
-		b, err = readByte(r)
+		b, err := r.ReadByte()
 		if err == io.EOF {
 			return nil, nil
 		}
 		if err != nil {
-			return
+			return nil, err
 		}
 
 		if prev == 0xFF && b == byte(m) {
-			return makeSection(r, offset)
+			return readSection(r, offset)
 		}
 
 		prev = b
 		offset++
 	}
-	return
+	return nil, nil
 }
 
-// makeSection reads the contents of the section at the current position of r.
-func makeSection(r io.Reader, offset int) (s *Section, err error) {
-	s = new(Section)
-	s.Offset = offset + 2
+// readSection reads the contents of the section at the current position of r.
+func readSection(r io.Reader, offset int) (*Section, error) {
+	s := Section{
+		Offset: offset + 2,
+	}
 
 	var size uint16
-	if err = binary.Read(r, binary.BigEndian, &size); err != nil {
+	if err := binary.Read(r, binary.BigEndian, &size); err != nil {
 		return nil, err
 	}
 
 	size -= 2 // marker is two bytes long.
 
-	s.Data = make([]byte, int(size))
+	s.Data = make([]byte, size)
 
-	if _, err = io.ReadFull(r, s.Data); err != nil {
+	if _, err := io.ReadFull(r, s.Data); err != nil {
 		return nil, err
 	}
 
-	return
+	return &s, nil
 }

@@ -1,6 +1,7 @@
 package streetsphere
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/xml"
 	"image"
@@ -8,6 +9,7 @@ import (
 	"image/draw"
 	"image/jpeg"
 	"io"
+	"io/ioutil"
 )
 
 type XMPMeta struct {
@@ -27,8 +29,13 @@ type PanoOpts struct {
 }
 
 // Pad reads a photosphere image and writes a padded 360 degree x 180 degree image to a given writer.
-func Pad(d []byte, w io.Writer) (pano *PanoOpts, err error) {
-	r := bytes.NewReader(d)
+func Pad(w io.Writer, ir io.Reader) (pano *PanoOpts, err error) {
+	d, err := ioutil.ReadAll(ir)
+	if err != nil {
+		return nil, err
+	}
+
+	r := bufio.NewReader(bytes.NewReader(d))
 	for {
 		s, err := NextSection(r, APP1)
 		if err != nil {
@@ -82,15 +89,7 @@ func Pad(d []byte, w io.Writer) (pano *PanoOpts, err error) {
 var xmpSentinel = []byte("http://ns.adobe.com/xap/1.0/\x00")
 
 func IsXMP(s *Section) bool {
-	if len(s.Data) < len(xmpSentinel) {
-		return false
-	}
-	for i, _ := range xmpSentinel {
-		if xmpSentinel[i] != s.Data[i] {
-			return false
-		}
-	}
-	return true
+	return bytes.HasPrefix(s.Data, xmpSentinel)
 }
 
 func ExtractXMP(s *Section) []byte {
