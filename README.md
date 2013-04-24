@@ -7,6 +7,13 @@ This project demonstrates several things:
 *  Conversion of image using Go's standard library.
 *  Google Maps API's Custom Street View.
 
+Live Demo
+=========
+
+The app is live, hosted on Google App Engine.
+
+http://street-sphere.appspot.com/
+
 License
 -------
 
