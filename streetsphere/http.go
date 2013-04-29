@@ -23,11 +23,13 @@ func init() {
 // sent in the response.
 func uploadHandler(c appengine.Context, w http.ResponseWriter, r *http.Request) *appError {
 	fn := fmt.Sprintf("photosphere-streetview-%d", time.Now().Unix())
-	w.Header().Add("Content-Disposition", fmt.Sprintf(`attachment;filename="%s.zip"`, fn))
 
 	err := r.ParseMultipartForm(10 << 20) // 10 MiB limit
 	if err != nil {
 		return appErrorf(err, "could not parse form")
+	}
+	if r.MultipartForm == nil {
+		return appErrorf(nil, "could not parse form")
 	}
 
 	b := r.MultipartForm.File["img"]
@@ -40,6 +42,8 @@ func uploadHandler(c appengine.Context, w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		return appErrorf(err, "could not read image from upload")
 	}
+
+	w.Header().Add("Content-Disposition", fmt.Sprintf(`attachment;filename="%s.zip"`, fn))
 
 	zw := zip.NewWriter(w)
 	iw, err := zw.Create(fmt.Sprintf("%s/%s", fn, img.Filename))
