@@ -24,7 +24,7 @@ func init() {
 func uploadHandler(c appengine.Context, w http.ResponseWriter, r *http.Request) *appError {
 	fn := fmt.Sprintf("photosphere-streetview-%d", time.Now().Unix())
 
-	err := r.ParseMultipartForm(10 << 20) // 10 MiB limit
+	err := r.ParseMultipartForm(25 << 20) // 25 MiB limit
 	if err != nil {
 		return appErrorf(err, "could not parse form")
 	}
