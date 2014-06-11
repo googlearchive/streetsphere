@@ -2,6 +2,7 @@ package streetsphere
 
 import (
 	"archive/zip"
+	"bytes"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -22,6 +23,8 @@ func init() {
 // generates a HTML file, then stores both files within a ZIP, which is then
 // sent in the response.
 func uploadHandler(c appengine.Context, w http.ResponseWriter, r *http.Request) *appError {
+	wbuf := new(bytes.Buffer)
+
 	fn := fmt.Sprintf("photosphere-streetview-%d", time.Now().Unix())
 
 	err := r.ParseMultipartForm(25 << 20) // 25 MiB limit
@@ -43,11 +46,9 @@ func uploadHandler(c appengine.Context, w http.ResponseWriter, r *http.Request) 
 		return appErrorf(err, "could not read image from upload")
 	}
 
-	w.Header().Add("Content-Disposition", fmt.Sprintf(`attachment;filename="%s.zip"`, fn))
-
-	zw := zip.NewWriter(w)
+	zw := zip.NewWriter(wbuf)
 	iw, err := zw.Create(fmt.Sprintf("%s/%s", fn, img.Filename))
-	if err != nil{
+	if err != nil {
 		return appErrorf(err, "could not create image in zip")
 	}
 
@@ -74,6 +75,11 @@ func uploadHandler(c appengine.Context, w http.ResponseWriter, r *http.Request) 
 	err = zw.Close()
 	if err != nil {
 		return appErrorf(err, "could not create zip file")
+	}
+
+	w.Header().Add("Content-Disposition", fmt.Sprintf(`attachment;filename="%s.zip"`, fn))
+	if _, err := wbuf.WriteTo(w); err != nil {
+		return appErrorf(err, "could not send zip file")
 	}
 	return nil
 }
