@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/xml"
+	"errors"
 	"image"
 	"image/color"
 	"image/draw"
@@ -59,6 +60,10 @@ func Pad(w io.Writer, ir io.Reader) (pano *PanoOpts, err error) {
 			pano = meta.PanoOpts
 			break
 		}
+	}
+
+	if pano == nil {
+		return nil, errors.New("image provided had no photo sphere metadata")
 	}
 
 	src, err := jpeg.Decode(bytes.NewReader(d))
