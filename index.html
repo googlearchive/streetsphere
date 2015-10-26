@@ -19,15 +19,44 @@
     </style>
   </head>
   <body>
-    <h1>Street Sphere: Photo Sphere to Street View generator</h1>
+    <h1>Street Sphere: Turn your photo spheres into embeddable panoramas</h1>
+
     <p>
-      Upload your Android photo sphere image, and you’ll get back a ready-to-use
-      Google Maps API Custom Street View web page.
+      <a href="https://www.google.com/maps/streetview/publish/">Photo spheres</a>
+      are 360-degree images users can create and share with Google Maps.
     </p>
+
+    <p>
+      Upload your photo sphere image (<code>.jpg</code>) to download a
+      ready-to-use Google Maps API Custom Street View web page.
+      Learn more about custom Street View panoramas on the 
+      <a href="https://developers.google.com/maps/documentation/javascript/streetview#CustomStreetView">Google
+      Maps APIs website</a>.
+    </p>
+
     <form action="/upload" method="post" enctype="multipart/form-data">
       <input type="file" name="img" id="file">
       <input type="submit" value="Upload!" id="submit">
     </form>
+
+    <p>
+      Want to practice? Download
+      <a href="https://drive.google.com/file/d/0BxEeOqcjSE5uY1g0VTFFVmJPRVk/view?usp=sharing" target="_blank">this
+      photo sphere image</a>, captured in Indonesia, from Google Drive.
+    </p>
+
+    <p>
+      Learn more about creating photo spheres on the
+      <a href="https://www.google.com/maps/streetview/publish/">Street
+      View website</a>.
+    </p>
+
+    <p>
+      Note: In order to publish this code on your website, be sure to
+      <a href="https://developers.google.com/maps/documentation/javascript/get-api-key">sign
+      up for a Maps APIs key</a>.
+    </p>
+
     <p>
       The source code for this app is available on
       <a href="https://github.com/googlemaps/streetsphere">GitHub</a>, under an

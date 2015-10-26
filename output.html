@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <script>
-      function initialize() {
+      function initPano() {
         var panoOptions = {
           pano: 'custom',
           visible: true,
@@ -36,11 +36,20 @@
           };
         }
       }
-
-      google.maps.event.addDomListener(window, 'load', initialize);
     </script>
   </head>
   <body>
     <div id="pano-canvas" style="height: 500px"></div>
+
+    <!-- TODO: ADD YOUR KEY AND REPLACE THE SCRIPT TAG BELOW.
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&signed_in=true&callback=initPano"
+        async defer>
+    -->
+
+    <script
+        src="https://maps.googleapis.com/maps/api/js?signed_in=true&callback=initPano"
+        async defer>
+    </script>
   </body>
 </html>
