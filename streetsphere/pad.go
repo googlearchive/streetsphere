@@ -27,6 +27,36 @@ type PanoOpts struct {
 	Width       int     `xml:"CroppedAreaImageWidthPixels,attr"`
 	Heading     float64 `xml:"PoseHeadingDegrees,attr"`
 	NS          string  `xml:"GPano,attr"`
+
+	// Element instead of attribute.
+	ETotalHeight int     `xml:"FullPanoHeightPixels"`
+	ETotalWidth  int     `xml:"FullPanoWidthPixels"`
+	ETop         int     `xml:"CroppedAreaTopPixels"`
+	ELeft        int     `xml:"CroppedAreaLeftPixels"`
+	EHeight      int     `xml:"CroppedAreaImageHeightPixels"`
+	EWidth       int     `xml:"CroppedAreaImageWidthPixels"`
+	EHeading     float64 `xml:"PoseHeadingDegrees"`
+}
+
+func (p *PanoOpts) Normalize() {
+	if p.TotalHeight == 0 {
+		p.TotalHeight = p.ETotalHeight
+	}
+	if p.TotalWidth == 0 {
+		p.TotalWidth = p.ETotalWidth
+	}
+	if p.Top == 0 {
+		p.Top = p.ETop
+	}
+	if p.Left == 0 {
+		p.Left = p.ELeft
+	}
+	if p.Height == 0 {
+		p.Height = p.EHeight
+	}
+	if p.Heading == 0 {
+		p.Heading = p.EHeading
+	}
 }
 
 // Pad reads a photosphere image and writes a padded 360 degree x 180 degree image to a given writer.
@@ -47,8 +77,9 @@ func Pad(w io.Writer, ir io.Reader) (pano *PanoOpts, err error) {
 		}
 
 		if IsXMP(s) {
+			xmp := ExtractXMP(s)
 			meta := new(XMPMeta)
-			err := xml.Unmarshal(ExtractXMP(s), meta)
+			err := xml.Unmarshal(xmp, meta)
 			if err != nil {
 				// Not XMP?
 				continue
@@ -65,6 +96,8 @@ func Pad(w io.Writer, ir io.Reader) (pano *PanoOpts, err error) {
 	if pano == nil {
 		return nil, errors.New("image provided had no photo sphere metadata")
 	}
+
+	pano.Normalize()
 
 	src, err := jpeg.Decode(bytes.NewReader(d))
 	if err != nil {
