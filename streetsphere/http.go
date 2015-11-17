@@ -6,9 +6,13 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"runtime/debug"
 	"time"
 
-	"appengine"
+	"golang.org/x/net/context"
+
+	"google.golang.org/appengine"
+	"google.golang.org/appengine/log"
 )
 
 var (
@@ -22,7 +26,16 @@ func init() {
 // uploadHandler retreives the image provided by the user, pads the image,
 // generates a HTML file, then stores both files within a ZIP, which is then
 // sent in the response.
-func uploadHandler(c appengine.Context, w http.ResponseWriter, r *http.Request) *appError {
+func uploadHandler(c context.Context, w http.ResponseWriter, r *http.Request) *appError {
+	defer func() {
+		if r := recover(); r != nil {
+			st := debug.Stack()
+			msg := fmt.Sprintf("recovered from panic: %v\nstack trace:\n%s", r, st)
+			http.Error(w, msg, 500)
+			log.Errorf(c, "%s", msg)
+		}
+	}()
+
 	wbuf := new(bytes.Buffer)
 
 	fn := fmt.Sprintf("photosphere-streetview-%d", time.Now().Unix())
@@ -84,17 +97,18 @@ func uploadHandler(c appengine.Context, w http.ResponseWriter, r *http.Request) 
 	return nil
 }
 
-func logError(c appengine.Context, msg string, err error) {
-	c.Errorf("%s (%v)", msg, err)
+func logError(c context.Context, msg string, err error) {
+	log.Errorf(c, "%s (%v)", msg, err)
 }
 
-type errorHandler func(appengine.Context, http.ResponseWriter, *http.Request) *appError
+type errorHandler func(context.Context, http.ResponseWriter, *http.Request) *appError
 
 func (handler errorHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
 	if e := handler(c, w, r); e != nil {
-		http.Error(w, e.Message, e.Code)
-		logError(c, e.Message, e.Error)
+		msg := fmt.Sprintf("%s (%v)", e.Message, e.Error)
+		http.Error(w, msg, e.Code)
+		log.Errorf(c, "%s", msg)
 	}
 }
 
