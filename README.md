@@ -6,6 +6,7 @@ This project demonstrates several things:
 *  Parsing XML metadata from a Android Street Sphere image.
 *  Conversion of image using Go's standard library.
 *  Google Maps API's Custom Street View.
+![Analytics](https://maps-ga-beacon.appspot.com/UA-12846745-20/streetsphere/readme?pixel)
 
 Live Demo
 ---------
